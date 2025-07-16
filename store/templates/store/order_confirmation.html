@@ -1,0 +1,12 @@
+{% extends 'store/main.html' %}
+{% block content %}
+    <div class="container">
+        <h2>Your order has been successfully placed!</h2>
+        <hr>
+        <p>Thank you for shopping with us. We have received your order and it is being processed.</p>
+        <p>Your total amount: &#8377;{{ total_amount }}</p>
+        <p>
+            You can <a href="{% url 'feedback' %}">provide feedback</a> on your experience.
+        </p>
+    </div>
+{% endblock %}

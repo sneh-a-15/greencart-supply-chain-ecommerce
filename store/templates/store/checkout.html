@@ -1,0 +1,149 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4 text-success">Checkout Page</h2>
+
+    <div class="row">
+        <!-- Address Form Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="mb-3">Add New Address</h4>
+                    <form method="POST" action="{% url 'checkout' %}">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-success">Add Address</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary Section -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body bg-light">
+                    <a class="btn btn-outline-success mb-3" href="{% url 'cart' %}">
+                        <i class="fas fa-arrow-left mr-1"></i> Back to Cart
+                    </a>
+                    <h4 class="mb-3">Order Summary</h4>
+                    {% for item in items %}
+                        <div class="d-flex align-items-center justify-content-between p-2 mb-2 rounded bg-white" style="box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+                            <div class="d-flex align-items-center">
+                                <a href="{% url 'item_detail' item.product.id %}">
+                                    <img src="{{ item.product.get_imageURL }}" style="width: 60px; height: 60px; object-fit: cover;" class="rounded mr-3">
+                                </a>
+                                <div>
+                                    <strong>{{ item.product.product_name }}</strong><br>
+                                    <small>₹{{ item.product.price|floatformat:2 }}</small>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="badge badge-success">x{{ item.quantity }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <hr>
+                    <h5>Items: {{ total_item_cart }}</h5>
+                    <h5>Total: ₹{{ total_cost_cart }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Saved Addresses Section -->
+    {% if request.user.is_authenticated %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="mb-3 text-primary">Use Saved Addresses</h5>
+                {% for adr in addresses %}
+                    <div class="border rounded p-3 mb-3 bg-white d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ adr.recepient_fullname }}</strong> ({{ adr.phone_no }})<br>
+                            {{ adr.address_line1 }}, {{ adr.address_line2 }}<br>
+                            {{ adr.city }}, {{ adr.state }}, {{ adr.country }} - {{ adr.zipcode }}
+                        </div>
+                        <button data-toggle="modal" data-target="#confirmOrderModal" data-address-id="{{ adr.id }}" class="btn btn-success btn-sm">Confirm Order</button>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">No saved addresses found.</p>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Just for Fun Footer
+    <blockquote class="blockquote text-center mt-5">
+        <p class="mb-0">** That's it! **</p>
+        <footer class="blockquote-footer">You've scrolled to the end of the list!</footer>
+    </blockquote> -->
+</div>
+
+<!-- Order Confirmation Modal -->
+<div class="modal fade" id="confirmOrderModal" tabindex="-1" role="dialog" aria-labelledby="confirmOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Your Order</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Are you sure you want to confirm this order?</p>
+                <p id="orderSummary" class="text-muted small"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmOrderButton" class="btn btn-primary">Confirm Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function(){
+        $('#confirmOrderModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var addressId = button.data('address-id');
+            var modal = $(this);
+            modal.find('#orderSummary').html('Address ID: ' + addressId);
+            modal.data('address-id', addressId);
+        });
+
+        $('#confirmOrderButton').click(function() {
+            var addressId = $('#confirmOrderModal').data('address-id');
+
+            $.ajax({
+                url: `/make-payment/${addressId}/`, // Use URL pattern directly
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: response.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = response.feedback_url;
+                        }
+                    });
+                },
+                error: function() {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Something went wrong. Please try again later.',
+                        icon: 'error'
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

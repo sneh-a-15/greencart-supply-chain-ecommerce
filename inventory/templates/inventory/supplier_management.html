@@ -1,0 +1,64 @@
+{% extends 'base_generic.html' %}
+
+{% block title %}Supplier Management | Supply Stream{% endblock %}
+
+{% block content %}
+{# Removed redundant <head> and <body> tags as they are inherited from base_generic.html #}
+
+<div class="flex h-screen bg-gray-50"> {# Consistent light background #}
+    {% include 'sidebar.html' %}
+    
+    <div class="flex-1 bg-white p-6 md:p-10 ml-64 overflow-y-auto h-full rounded-tl-lg shadow-inner"> 
+        <div class="flex justify-between items-center border-b border-gray-200 pb-4 mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-800">Supplier Directory</h1>
+            {# Optional: Add an "Add Supplier" button here if that feature exists #}
+            {# For example: #}
+            {# <a href="{% url 'add_supplier' %}" #}
+            {#    class="bg-green-600 text-white py-2.5 px-5 rounded-full font-bold shadow-md #}
+            {#           hover:bg-green-700 transition-all transform hover:scale-105 flex items-center gap-2"> #}
+            {#     <i class="fas fa-plus-circle"></i> Add New Supplier #}
+            {# </a> #}
+        </div>
+
+        {% if suppliers %}
+            <div class="overflow-x-auto rounded-lg shadow-xl border border-gray-100"> {# Modern table container #}
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-200">
+                            <th class="p-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Supplier Name</th>
+                            <th class="p-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
+                            <th class="p-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for supplier in suppliers %}
+                            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                                <td class="p-4 text-sm text-gray-800 font-medium">{{ supplier.name }}</td>
+                                <td class="p-4 text-sm text-gray-800">{{ supplier.email }}</td>
+                                <td class="p-4">
+                                    <a href="mailto:{{ supplier.email }}" 
+                                       class="bg-blue-600 text-white py-1.5 px-3 rounded-md text-sm font-semibold
+                                              hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 w-fit">
+                                        <i class="fas fa-envelope"></i> Email
+                                    </a>
+                                    
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="bg-gray-100 p-6 rounded-lg text-center text-gray-600 text-lg shadow-md border border-gray-200">
+                <i class="fas fa-industry text-3xl text-gray-400 mb-3"></i>
+                <p>No suppliers registered yet. Start by adding your first supplier!</p>
+                {# Add a button to add suppliers if 'add_supplier' URL exists #}
+                {# <div class="mt-4"> #}
+                {#    <a href="{% url 'add_supplier' %}" class="bg-green-600 text-white py-2 px-5 rounded-full font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 mx-auto w-fit"> #}
+                {#        <i class="fas fa-plus-circle"></i> Add Supplier #}
+                {#    </a> #}
+                {# </div> #}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

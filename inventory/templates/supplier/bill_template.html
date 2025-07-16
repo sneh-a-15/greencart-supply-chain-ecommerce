@@ -1,0 +1,48 @@
+{% extends 'base_generic.html' %}
+{% block title %}Bill{% endblock %}
+{% block content %}
+  <!-- Page Background -->
+  <div class="bg-yellow-100 min-h-screen py-6">
+    <div class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-6 border-2 border-gray-200">
+      <!-- Bill Title -->
+      <h2 class="text-4xl font-bold text-center text-gray-800 mb-6 bg-blue-300 text-white p-4 rounded-md shadow-md">Restock Bill</h2>
+
+      <!-- Supplier Details -->
+      <div class="mb-6 bg-gray-200 p-4 rounded-md shadow-md">
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Supplier Details</h3>
+        <p class="text-lg text-gray-700"><strong>Supplier Name:</strong> {{ bill_data.0.supplier_name }}</p>
+        <p class="text-lg text-gray-700"><strong>Email:</strong> {{ bill_data.0.supplier_email }}</p>
+        <p class="text-lg text-gray-700"><strong>Address:</strong> {{ bill_data.0.supplier_address }}</p>
+      </div>
+
+      <!-- Product Table -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full table-auto border-collapse border border-gray-300">
+          <thead class="bg-gray-300">
+            <tr>
+              <th class="py-2 px-4 border border-gray-300 text-left text-gray-800 font-semibold">Product Name</th>
+              <th class="py-2 px-4 border border-gray-300 text-left text-gray-800 font-semibold">Quantity</th>
+              <th class="py-2 px-4 border border-gray-300 text-left text-gray-800 font-semibold">Unit Price</th>
+              <th class="py-2 px-4 border border-gray-300 text-left text-gray-800 font-semibold">Total Cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in bill_data %}
+              <tr class="border-b border-gray-200 hover:bg-gray-100">
+                <td class="py-2 px-4 text-gray-800">{{ item.product_name }}</td>
+                <td class="py-2 px-4 text-gray-800">{{ item.quantity }}</td>
+                <td class="py-2 px-4 text-right text-gray-800">₹{{ item.unit_price|floatformat:2 }}</td>
+                <td class="py-2 px-4 text-right text-gray-800">₹{{ item.total_cost|floatformat:2 }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Total Bill Amount -->
+      <div class="mt-6 text-right">
+        <h3 class="text-2xl font-semibold text-green-700">Total Bill Amount: ₹{{ total_cost|floatformat:2 }}</h3>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restock Bill</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mx-auto py-8">
+        <h2 class="text-2xl font-bold mb-6">Restocking Request</h2>
+
+        <!-- Supplier Details Section -->
+        <div class="flex justify-end mb-4">
+            {% if restock_requests.0.supplier %}
+                <div class="bg-gray-100 p-4 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold">Supplier Details</h3>
+                    <p><strong>Name:</strong> {{ restock_requests.0.supplier.name }}</p>
+                    <p><strong>Address:</strong> {{ restock_requests.0.supplier.address }}</p>
+                    <p><strong>Contact:</strong> {{ restock_requests.0.supplier.contact }}</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Restock Request Table -->
+        <table class="min-w-full bg-white border">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="py-2 px-4 border">Product</th>
+                    <th class="py-2 px-4 border">Requested Quantity</th>
+                    <th class="py-2 px-4 border">Price per Item</th>
+                    <th class="py-2 px-4 border">Total Cost (Before Discount)</th>
+                    <th class="py-2 px-4 border">Discount (%)</th>
+                    <th class="py-2 px-4 border">Total Cost (After Discount)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for restock in restock_requests %}
+                <tr>
+                    <td class="py-2 px-4 border">{{ restock.product.product_name }}</td>
+                    <td class="py-2 px-4 border">{{ restock.quantity }}</td>
+                    <td class="py-2 px-4 border">${{ restock.product.price | floatformat:2 }}</td>
+                    <td class="py-2 px-4 border">${{ restock.total_cost_before_discount | floatformat:2 }}</td>
+                    <td class="py-2 px-4 border">{{ restock.discount }}%</td>
+                    <td class="py-2 px-4 border">${{ restock.total_cost_after_discount | floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{% extends 'base_generic.html' %}
+
+{% block title %}Update Product{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-8">
+    <h1 class="text-3xl font-semibold text-gray-800 mb-6">Update Product</h1>
+    
+    <form method="POST" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Render form fields with better spacing and design -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {{ form.as_p }}
+        </div>
+
+        <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition duration-200">
+            Update Product
+        </button>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+<div class="container my-5">
+
+    <!-- Product Section -->
+    <div class="row align-items-center">
+        <div class="col-lg-5 text-center mb-4 mb-lg-0">
+            <img src="{{ product.get_imageURL }}" class="img-fluid rounded shadow-sm" style="max-height: 300px;" alt="{{ product.product_name }}">
+        </div>
+
+        <div class="col-lg-7">
+            <h2 class="text-success font-weight-bold">{{ product.product_name }}</h2>
+            <h4 class="text-dark font-weight-semibold mb-3">₹{{ product.price }}</h4>
+
+            {% if limited_stock %}
+                <p class="text-danger font-weight-bold small">⚠ Hurry! Only a few left in stock!</p>
+            {% endif %}
+
+            <p class="text-muted"><strong>Description:</strong> {{ product.description }}</p>
+
+            <!-- Buttons -->
+            <div class="mt-4 d-flex gap-3">
+                <button class="btn btn-success btn-lg update_cart" product_id="{{ product.id }}">
+                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
+                </button>
+
+                <!-- Optional: Quantity Controls (Future Integration) -->
+                <!-- 
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-secondary chg-quantity mx-2" action="remove" product_id="{{ product.id }}">
+                        <i class="fas fa-minus-circle"></i>
+                    </button>
+                    <span class="mx-2 font-weight-bold">1</span>
+                    <button class="btn btn-outline-secondary chg-quantity mx-2" action="add" product_id="{{ product.id }}">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                </div> 
+                -->
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

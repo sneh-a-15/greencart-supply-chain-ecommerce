@@ -1,0 +1,220 @@
+{% extends 'base_generic.html' %}
+
+{% block title %}Restock Management | Supply Stream{% endblock %}
+
+{% block content %}
+{# Remove <body> tag as it's inherited from base_generic.html #}
+
+<div class="flex h-screen bg-gray-50"> {# Consistent light background #}
+    {% include 'sidebar.html' %}
+    
+    <div class="flex-1 bg-white p-6 md:p-10 ml-64 overflow-y-auto h-full rounded-tl-lg shadow-inner"> 
+        <div class="flex justify-between items-center border-b border-gray-200 pb-4 mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-800">Low Stock Products for Restock</h1>
+            {# Optional: Add a general "Send All Requests" button here or filters if needed #}
+        </div>
+
+        {% if products_by_supplier|length > 0 %}
+            <form id="restockForm" action="{% url 'send_restock_request' %}" method="post" class="space-y-8"> {# Increased vertical spacing #}
+                {% csrf_token %}
+            
+                {% for supplier, supplier_products in products_by_supplier.items %}
+                    <div class="bg-gray-50 rounded-xl p-6 shadow-md border border-gray-200"> {# Card for each supplier #}
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 border-b pb-4 border-gray-200">
+                            <h2 class="text-xl font-bold text-gray-800 mb-3 sm:mb-0 flex items-center gap-2">
+                                <i class="fas fa-industry text-purple-600"></i> Supplier: {{ supplier }}
+                            </h2>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <button type="button" 
+                                        class="select-all bg-green-500 text-white py-2.5 px-5 rounded-full font-semibold hover:bg-green-600 transition-all shadow-sm flex items-center gap-2" 
+                                        data-supplier="{{ supplier }}">
+                                    <i class="fas fa-check-square"></i> Select All
+                                </button>
+                                <button type="button" 
+                                        class="send-request bg-blue-600 text-white py-2.5 px-5 rounded-full font-semibold hover:bg-blue-700 transition-all shadow-sm flex items-center gap-2" 
+                                        data-supplier="{{ supplier }}">
+                                    <i class="fas fa-paper-plane"></i> Send Requests
+                                </button>
+                            </div>
+                        </div>
+
+                        <ul class="space-y-4"> {# Spacing for product items #}
+                            {% for product in supplier_products %}
+                                <li class="flex items-center gap-4 p-4 border border-gray-300 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                                    <input type="checkbox" name="products" value="{{ product.id }}" 
+                                           class="form-checkbox h-5 w-5 text-green-600 rounded focus:ring-green-500 supplier-checkbox" 
+                                           data-supplier="{{ supplier }}" />
+                                    
+                                    <div class="flex-1 flex flex-col md:flex-row justify-between items-start md:items-center">
+                                        <div class="mb-2 md:mb-0">
+                                            <p class="font-semibold text-gray-900 text-lg">{{ product.product_name }}</p>
+                                            <p class="text-gray-600 text-sm flex items-center gap-1">
+                                                <i class="fas fa-boxes text-gray-400"></i> Current Stock: 
+                                                <span class="font-bold 
+                                                    {% if product.stock_quantity <= 10 %}text-red-600
+                                                    {% elif product.stock_quantity <= 50 %}text-orange-600
+                                                    {% else %}text-green-600{% endif %}">
+                                                    {{ product.stock_quantity }}
+                                                </span>
+                                            </p>
+                                        </div>
+                                        {% if product.image %} {# Assuming product_image field exists for products #}
+                                             <img src="{{ product.get_imageURL }}" alt="{{ product.product_name }}" 
+                                                 class="w-16 h-16 object-cover rounded-md border border-gray-200">
+                                        {% else %}
+                                            <img src="https://via.placeholder.com/64x64?text=No+Image" alt="No Image" 
+                                                 class="w-16 h-16 object-cover rounded-md border border-gray-200">
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% empty %}
+                                <div class="bg-white p-6 rounded-lg text-center text-gray-600 text-md shadow-inner">
+                                    <i class="fas fa-check text-xl text-green-500 mb-2"></i>
+                                    <p>All products from this supplier are currently well-stocked.</p>
+                                </div>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            </form>
+        {% else %}
+            <div class="bg-gray-100 p-6 rounded-lg text-center text-gray-600 text-lg shadow-md border border-gray-200">
+                <i class="fas fa-boxes text-3xl text-gray-400 mb-3"></i>
+                <p>Great! All your products are currently well-stocked. No restock requests needed.</p>
+                <div class="mt-4">
+                    <a href="{% url 'product_list' %}" class="bg-green-600 text-white py-2 px-5 rounded-full font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 mx-auto w-fit">
+                        <i class="fas fa-warehouse"></i> View All Products
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to toggle checkboxes for a specific supplier
+            document.querySelectorAll('.select-all').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const supplier = this.getAttribute('data-supplier');
+                    const checkboxes = document.querySelectorAll(`input[type="checkbox"][data-supplier="${supplier}"]`);
+                    const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+                    
+                    checkboxes.forEach(function(checkbox) {
+                        checkbox.checked = !allChecked; // Toggle the checkbox state
+                    });
+                    // Update button text and icon
+                    if (allChecked) {
+                        e.target.innerHTML = '<i class="fas fa-check-square"></i> Select All';
+                    } else {
+                        e.target.innerHTML = '<i class="fas fa-minus-square"></i> Deselect All';
+                    }
+                });
+            });
+
+            // Function to handle sending requests for a specific supplier
+            document.querySelectorAll('.send-request').forEach(button => {
+                button.addEventListener('click', async function(e) { // Use async for await Swal.fire
+                    e.preventDefault();
+
+                    const supplier = this.getAttribute('data-supplier');
+                    const checkboxes = document.querySelectorAll(`input[type="checkbox"][data-supplier="${supplier}"]:checked`);
+                    const selectedProductIds = Array.from(checkboxes).map(cb => cb.value);
+
+                    if (selectedProductIds.length === 0) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'No Products Selected',
+                            text: 'Please select at least one product to send a restock request for this supplier.',
+                            confirmButtonColor: '#34D399', // Green color
+                        });
+                        return;
+                    }
+
+                    // Use SweetAlert2 to get quantity from user
+                    const { value: quantityInput } = await Swal.fire({
+                        title: 'Specify Quantity for Restock',
+                        input: 'number',
+                        inputLabel: 'Enter the quantity for selected products:',
+                        inputPlaceholder: 'e.g., 50 (leave blank for default 700)',
+                        showCancelButton: true,
+                        confirmButtonText: 'Confirm Quantity',
+                        cancelButtonText: 'Cancel',
+                        confirmButtonColor: '#34D399', // Green color
+                        cancelButtonColor: '#EF4444', // Red color
+                        inputValidator: (value) => {
+                            if (value && (isNaN(value) || parseInt(value) <= 0)) {
+                                return 'Please enter a valid positive number for quantity.';
+                            }
+                        }
+                    });
+
+                    if (quantityInput === undefined) { // User clicked cancel or dismissed
+                        return;
+                    }
+
+                    const quantity = quantityInput === '' ? 700 : parseInt(quantityInput); // Default to 700 if empty
+
+                    // Confirm before submitting
+                    const confirmResult = await Swal.fire({
+                        title: 'Send Restock Requests?',
+                        html: `You are about to send restock requests for <strong>${selectedProductIds.length} product(s)</strong> from <strong>${supplier}</strong>, each for a quantity of <strong>${quantity}</strong>.`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, Send Them!',
+                        cancelButtonText: 'No, Cancel',
+                        confirmButtonColor: '#10B981', // Emerald green
+                        cancelButtonColor: '#EF4444', // Red color
+                    });
+
+                    if (confirmResult.isConfirmed) {
+                        // Create a temporary form to submit only selected items for the specific supplier
+                        const tempForm = document.createElement('form');
+                        tempForm.method = 'POST';
+                        tempForm.action = "{% url 'send_restock_request' %}";
+                        tempForm.style.display = 'none';
+
+                        // Add CSRF token
+                        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                        const csrfInput = document.createElement('input');
+                        csrfInput.type = 'hidden';
+                        csrfInput.name = 'csrfmiddlewaretoken';
+                        csrfInput.value = csrfToken;
+                        tempForm.appendChild(csrfInput);
+
+                        // Add selected product IDs
+                        selectedProductIds.forEach(productId => {
+                            const productInput = document.createElement('input');
+                            productInput.type = 'hidden';
+                            productInput.name = 'products';
+                            productInput.value = productId;
+                            tempForm.appendChild(productInput);
+                        });
+
+                        // Add quantity
+                        const quantityHiddenInput = document.createElement('input');
+                        quantityHiddenInput.type = 'hidden';
+                        quantityHiddenInput.name = 'quantity';
+                        quantityHiddenInput.value = quantity;
+                        tempForm.appendChild(quantityHiddenInput);
+
+                        document.body.appendChild(tempForm);
+                        tempForm.submit();
+
+                        // Show success message (will likely be interrupted by redirect, but good for local testing)
+                        Swal.fire({
+                            title: 'Sent!',
+                            text: 'Restock requests have been sent successfully.',
+                            icon: 'success',
+                            confirmButtonColor: '#34D399', // Green color
+                        }).then(() => {
+                            // Redirect after SweetAlert is closed
+                            window.location.href = "{% url 'user_notifications' %}"; 
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

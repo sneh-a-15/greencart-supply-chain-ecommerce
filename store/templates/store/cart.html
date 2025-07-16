@@ -1,0 +1,108 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+<style>
+    /* Soften hover on cart quantity buttons */
+    .update_cart_quantity:hover {
+        background-color: #f0fdf4; /* very light green */
+        color: #065f46; /* darker green */
+        border-color: #d1fae5; /* subtle border */
+        transition: all 0.2s ease;
+    }
+
+    /* Remove strong focus ring */
+    .update_cart_quantity:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    /* Soften hover on all buttons */
+    .btn:hover {
+        opacity: 0.9;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transform: translateY(-1px);
+    }
+
+    .btn:focus {
+        box-shadow: none;
+        outline: none;
+    }
+
+    /* Prevent harsh color change on table row hover */
+    .card-body:hover {
+        background-color: #fafff4; /* stay subtle */
+    }
+</style>
+
+<div class="container my-5">
+    {% if total_item_cart %}
+        <h2 class="mb-4 text-success">Your Shopping Cart 🛒</h2>
+    {% else %}
+        <h2 class="mb-4 text-muted">Your Shopping Cart is empty 😔</h2>
+    {% endif %}
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body bg-light">
+            <a class="btn btn-outline-success mb-3" href="{% url 'store' %}">
+                <i class="fas fa-arrow-left mr-1"></i> Continue Shopping
+            </a>
+
+            <table class="table table-borderless mb-0">
+                <tbody>
+                    <tr>
+                        <td><h5 class="mb-0">Items: <strong>{{ total_item_cart }}</strong></h5></td>
+                        <td><h5 class="mb-0">Total: <strong>₹{{ total_cost_cart }}</strong></h5></td>
+                        <td class="text-right">
+                            {% if check %}
+                                <a class="btn btn-success" href="{% url 'checkout' %}">Checkout</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if request.user.is_authenticated %}
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-success text-white font-weight-bold d-none d-md-flex">
+                <div class="col-md-2">Product</div>
+                <div class="col-md-3">Item</div>
+                <div class="col-md-2">Price</div>
+                <div class="col-md-3">Quantity</div>
+                <div class="col-md-2">Total</div>
+            </div>
+
+            {% for item in items %}
+                <div class="row no-gutters align-items-center py-3 px-2 border-bottom" style="background-color: #fafff4;">
+                    <div class="col-md-2 text-center mb-2 mb-md-0">
+                        <a href="{% url 'item_detail' item.product.id %}">
+                            <img src="{{ item.product.get_imageURL }}" class="img-thumbnail" style="width: 80px; height: 80px;">
+                        </a>
+                    </div>
+                    <div class="col-md-3 text-center mb-2 mb-md-0">
+                        <p class="font-weight-bold mb-0">{{ item.product.product_name }}</p>
+                    </div>
+                    <div class="col-md-2 text-center mb-2 mb-md-0">
+                        <p class="text-muted mb-0">₹{{ item.product.price }}</p>
+                    </div>
+                    <div class="col-md-3 text-center mb-2 mb-md-0">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <button class="btn btn-sm btn-outline-success mx-1 update_cart_quantity" action="add" product_id="{{ item.product.id }}">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <span class="mx-2 font-weight-bold">{{ item.quantity }}</span>
+                            <button class="btn btn-sm btn-outline-danger mx-1 update_cart_quantity" action="remove" product_id="{{ item.product.id }}">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <p class="text-success font-weight-bold mb-0">₹{{ item.get_total }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock content %}

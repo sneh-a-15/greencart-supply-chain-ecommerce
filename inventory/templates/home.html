@@ -1,0 +1,215 @@
+{% extends 'base_generic.html' %}
+
+{% block title %}Home | Supply Stream{% endblock %}
+
+{% block content %}
+<div class="fixed inset-0 z-[-1] bg-gradient-to-br from-green-50 via-white to-green-100 overflow-hidden">
+    <div class="absolute top-1/4 left-10 w-72 h-72 bg-green-200/40 rounded-full blur-3xl animate-blob-float-1"></div>
+    <div class="absolute bottom-1/4 right-10 w-72 h-72 bg-green-300/30 rounded-full blur-3xl animate-blob-float-2 delay-1000"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-green-100/20 rounded-full blur-3xl animate-blob-float-3 delay-500"></div>
+</div>
+
+<nav class="bg-white/90 backdrop-blur-md shadow-lg py-4 mb-8 sticky top-0 z-50 border-b border-gray-100">
+    <div class="container mx-auto px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-truck-loading text-3xl text-green-600 animate-pulse-slow"></i>
+            <h1 class="text-3xl font-bold text-green-700">Supply Stream</h1>
+        </div>
+        <div class="flex items-center gap-6">
+            <a href="{% url 'login_supplier' %}" class="text-gray-700 hover:text-green-600 font-medium transition-colors group relative">
+                Supplier Login
+                <span class="absolute left-0 bottom-0 w-full h-0.5 bg-green-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+            </a>
+            <a href="{% url 'login' %}" class="text-gray-700 hover:text-green-600 font-medium transition-colors group relative">
+                User Login
+                <span class="absolute left-0 bottom-0 w-full h-0.5 bg-green-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+            </a>
+            <a href="{% url 'signup' %}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all">Sign Up Free</a>
+        </div>
+    </div>
+</nav>
+
+<section class="container mx-auto px-6 text-center pt-16 pb-24 relative overflow-hidden">
+    <div class="max-w-4xl mx-auto z-10 relative">
+        <h1 class="text-6xl font-extrabold text-gray-800 mb-6 animate-fade-in-down leading-tight">
+            Revolutionize Your 
+            <span class="text-green-600">Supply Chain</span>
+        </h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-10 animate-fade-in-up">
+            Effortlessly manage suppliers, track inventory, and gain data-driven insights with our intelligent platform.
+        </p>
+        <div class="flex gap-6 justify-center animate-fade-in-up delay-300">
+            <a href="{% url 'signup' %}" class="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-full text-lg font-bold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all">
+                Get Started Free
+            </a>
+            <a href="{% url 'login' %}" class="border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-10 py-4 rounded-full text-lg font-bold transition-all flex items-center gap-2">
+                View Demo <i class="fas fa-play-circle text-xl"></i>
+            </a>
+        </div>
+    </div>
+    <i class="fas fa-boxes absolute top-10 left-10 text-green-100 text-9xl opacity-70 animate-rotate-slow z-0 hidden lg:block"></i>
+    <i class="fas fa-truck-moving absolute bottom-10 right-10 text-green-100 text-9xl opacity-70 animate-pulse-slow z-0 hidden lg:block"></i>
+</section>
+
+<section class="container mx-auto px-6 mb-16 ">
+    <h2 class="text-4xl font-bold text-center text-gray-800 mb-12 animate-fade-in-up">What Supply Stream Offers</h2>
+    <div class="grid md:grid-cols-2 gap-10">
+        <div class="bg-white/70 backdrop-blur-sm rounded-3xl p-10 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 animate-fade-in-right border border-gray-50">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 shadow-md">
+                <i class="fas fa-chart-line text-green-600 text-3xl"></i>
+            </div>
+            <h3 class="text-3xl font-bold text-gray-800 mb-4">AI-Powered Analytics</h3>
+            <p class="text-gray-700 mb-6 text-lg leading-relaxed">Gain deep insights into inventory levels, supplier performance, and market trends with intelligent recommendations to optimize your entire operation.</p>
+            <a href="{% url 'login_supplier' %}" class="text-green-600 font-semibold hover:text-green-700 inline-flex items-center group">
+                Explore Analytics <i class="fas fa-arrow-right ml-3 group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+
+        <div class="bg-white/70 backdrop-blur-sm rounded-3xl p-10 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 animate-fade-in-left border border-gray-50">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 shadow-md">
+                <i class="fas fa-bell text-green-600 text-3xl"></i>
+            </div>
+            <h3 class="text-3xl font-bold text-gray-800 mb-4">Real-time Alert System</h3>
+            <p class="text-gray-700 mb-6 text-lg leading-relaxed">Receive instant, proactive notifications for low stock, potential delays, and critical supply chain events, ensuring you're always a step ahead.</p>
+            <a href="{% url 'login' %}" class="text-green-600 font-semibold hover:text-green-700 inline-flex items-center group">
+                See Alerts in Action <i class="fas fa-arrow-right ml-3 group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+---
+
+<section class="bg-gradient-to-r from-green-600 to-emerald-600 text-white py-16 px-8 rounded-3xl shadow-2xl max-w-6xl mx-auto mb-16 animate-slide-up relative overflow-hidden">
+    <div class="text-center z-10 relative">
+        <h2 class="text-4xl font-bold mb-4">Intelligent Supply Chain Management Made Simple</h2>
+        <p class="text-xl opacity-95 max-w-3xl mx-auto">Track inventory, monitor performance, and automate alerts with powerful, AI-driven insights that empower your business.</p>
+        <div class="mt-8">
+            <a href="{% url 'signup' %}" class="bg-white text-green-700 hover:bg-gray-100 px-8 py-4 rounded-full text-lg font-bold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all">
+                Discover How
+            </a>
+        </div>
+    </div>
+    <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=\'6\' height=\'6\' viewBox=\'0 0 6 6\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.7\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M5 0h1L0 6V5zM6 5v1H0V0z\'/%3E%3C/g%3E%3C/svg%3E');"></div>
+</section>
+
+---
+
+<section class="bg-white/60 py-16 px-6 mb-16 rounded-xl shadow-inner">
+    <div class="container mx-auto">
+        <h2 class="text-4xl font-bold text-center text-gray-800 mb-12 animate-fade-in-up">Key Advantages for Your Business</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-gray-50">
+                <div class="w-20 h-20 bg-green-100 rounded-full mx-auto mb-6 flex items-center justify-center shadow-md">
+                    <i class="fas fa-bolt text-green-600 text-3xl"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800 mb-3">Instant Alerts</h4>
+                <p class="text-gray-600 leading-relaxed">Get real-time notifications to prevent stockouts and costly delivery delays.</p>
+            </div>
+            
+            <div class="text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-gray-50">
+                <div class="w-20 h-20 bg-green-100 rounded-full mx-auto mb-6 flex items-center justify-center shadow-md">
+                    <i class="fas fa-chart-bar text-green-600 text-3xl"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800 mb-3">Strategic Analytics</h4>
+                <p class="text-gray-600 leading-relaxed">Leverage data-driven insights to make smarter decisions and optimize your strategy.</p>
+            </div>
+            
+            <div class="text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-gray-50">
+                <div class="w-20 h-20 bg-green-100 rounded-full mx-auto mb-6 flex items-center justify-center shadow-md">
+                    <i class="fas fa-handshake text-green-600 text-3xl"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800 mb-3">Seamless Supplier Management</h4>
+                <p class="text-gray-600 leading-relaxed">Streamline communication, track performance, and build stronger supplier relationships.</p>
+            </div>
+            
+            <div class="text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border border-gray-50">
+                <div class="w-20 h-20 bg-green-100 rounded-full mx-auto mb-6 flex items-center justify-center shadow-md">
+                    <i class="fas fa-plug text-green-600 text-3xl"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800 mb-3">Effortless Integration</h4>
+                <p class="text-gray-600 leading-relaxed">Connect seamlessly with your existing systems for a unified operational view.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+@keyframes fade-in-down {
+    0% { opacity: 0; transform: translateY(-30px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+    0% { opacity: 0; transform: translateY(50px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-up {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-right {
+    0% { opacity: 0; transform: translateX(30px); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fade-in-left {
+    0% { opacity: 0; transform: translateX(-30px); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+
+/* Custom Blob Float Animation */
+@keyframes blob-float-1 {
+    0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+    33% { transform: translate(20px, 30px) scale(1.05); opacity: 0.5; }
+    66% { transform: translate(-10px, -20px) scale(0.95); opacity: 0.35; }
+    100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+}
+
+@keyframes blob-float-2 {
+    0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+    33% { transform: translate(-20px, -30px) scale(1.05); opacity: 0.4; }
+    66% { transform: translate(10px, 20px) scale(0.95); opacity: 0.25; }
+    100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+}
+
+@keyframes blob-float-3 {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.2; }
+    50% { transform: translate(-55%, -45%) scale(1.03); opacity: 0.25; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0.2; }
+}
+
+/* Subtle pulse for icons */
+@keyframes pulse-slow {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Slow rotate for background icons */
+@keyframes rotate-slow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+.animate-fade-in-down { animation: fade-in-down 0.8s ease-out forwards; }
+.animate-fade-in-up { animation: fade-in-up 0.8s ease-out forwards; }
+.animate-slide-up { animation: slide-up 1s ease-out forwards; }
+.animate-fade-in-left { animation: fade-in-left 0.8s ease-out forwards; }
+.animate-fade-in-right { animation: fade-in-right 0.8s ease-out forwards; }
+
+.animate-blob-float-1 { animation: blob-float-1 10s ease-in-out infinite alternate; }
+.animate-blob-float-2 { animation: blob-float-2 12s ease-in-out infinite alternate; }
+.animate-blob-float-3 { animation: blob-float-3 15s ease-in-out infinite alternate; }
+.animate-pulse-slow { animation: pulse-slow 3s infinite ease-in-out; }
+.animate-rotate-slow { animation: rotate-slow 60s linear infinite; }
+
+
+.delay-300 { animation-delay: 0.3s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-1000 { animation-delay: 1s; }
+</style>
+{% endblock %}

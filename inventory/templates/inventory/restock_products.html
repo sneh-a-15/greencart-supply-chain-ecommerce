@@ -1,0 +1,37 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<div class="container mx-auto py-8">
+    <h2 class="text-2xl font-bold mb-6">Low Stock Products</h2>
+
+    <form method="POST" action="{% url 'send_restock_request' %}">
+        {% csrf_token %}
+        <table class="min-w-full bg-white border">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="py-2 px-4 border">Select</th>
+                    <th class="py-2 px-4 border">Product Name</th>
+                    <th class="py-2 px-4 border">Current Stock</th>
+                    <th class="py-2 px-4 border">Required Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td class="py-2 px-4 border text-center">
+                        <input type="checkbox" name="products" value="{{ product.id }}" class="form-checkbox">
+                    </td>
+                    <td class="py-2 px-4 border">{{ product.product_name }}</td>
+                    <td class="py-2 px-4 border">{{ product.stock_level }}</td>
+                    <td class="py-2 px-4 border">
+                        <input type="number" name="restock_quantity_{{ product.id }}" value="10" min="1" class="border rounded px-2 py-1">
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Generate Restock Request</button>
+    </form>
+</div>
+{% endblock %}

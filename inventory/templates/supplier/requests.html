@@ -1,0 +1,28 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-4">Restock Requests</h1>
+
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">Pending Requests</h2>
+
+        {% if restock_requests %}
+            <ul class="divide-y divide-gray-200">
+                {% for request in restock_requests %}
+                    <li class="py-4 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-medium">{{ request.product.product_name }}</h3>
+                            <p class="text-sm text-gray-600">Requested Quantity: {{ request.quantity }}</p>
+                            <p class="text-sm text-gray-600">Supplier: {{ request.supplier.supplier_name }}</p>
+                        </div>
+                        <span class="text-sm text-gray-500">Status: {{ request.status }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-sm text-gray-500">No restock requests at the moment.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
