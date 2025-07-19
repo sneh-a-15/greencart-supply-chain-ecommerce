@@ -15,7 +15,7 @@ urlpatterns = [
     path('notifications/', view1.user_notifications, name='user_notifications'),
     path('notifications/mark-resolved/<int:notification_id>/', view1.mark_notification_resolved, name='mark_notification_resolved'),
     # path('out-of-stock/', view1.out_of_stock_products, name='out_of_stock_products'),
-    path('low-stock/', view1.low_stock_products, name='low_stock_products'),
+    path('low-stock/', view1.low_stock, name='low_stock'),
     path('send-restock-requests/', view1.send_restock_request, name='send_restock_request'),
     path('supplier_dashboard/',view1.supplier_dashboard, name='supplier_dashboard'),
     path('login_supplier',view1.login_supplier,name="login_supplier"),
@@ -30,4 +30,10 @@ urlpatterns = [
     path('order-management/', view1.restock_management, name='restock_management'),
     path('supplier_management/', view1.supplier_management, name='supplier_management'),
     path('generate_bill/', view1.generate_bill, name='generate_bill'),
+    # graphs
+    path("api/sales-data/", view1.sales_graph_data, name="sales_data"),
+    path("api/abc-classification/", view1.abc_classification_data, name="abc_data"),
+    path("api/top-products/", view1.top_products_data, name="top_products"),
+    path("api/low-stock/", view1.low_stock_products, name="low_stock_api"),
+    path("api/dashboard-counts/", view1.dashboard_counts, name="dashboard_counts"),  # Add this line
 ]

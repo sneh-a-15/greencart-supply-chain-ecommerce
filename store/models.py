@@ -26,7 +26,7 @@ class ShippingAddress(models.Model):
 
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=False)
     recepient_fullname = models.CharField(max_length=100,null=True,blank=False)
-    phone_no = models.IntegerField(null=False,blank=False)
+    phone_no = models.CharField(max_length=15,null=False,blank=False)
     address_line1 = models.CharField(max_length=200, null=True,blank=False)
     address_line2 = models.CharField(max_length=100,null=True,blank=True)
     city = models.CharField(max_length=200, null=False)
@@ -44,7 +44,7 @@ class FullOrder(models.Model):
 
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True)
     recepient_fullname = models.CharField(max_length=100, null=True, blank=False)
-    phone_no = models.IntegerField(null=True, blank=False)
+    phone_no = models.CharField(null=True, blank=False)
     address_line1 = models.CharField(max_length=200, null=True, blank=False)
     address_line2 = models.CharField(max_length=100, null=True, blank=True)
     city = models.CharField(max_length=200, null=True,blank=False)

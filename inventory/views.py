@@ -156,7 +156,7 @@ def mark_notification_resolved(request, notification_id):
     return redirect('user_notifications')
 
 @login_required
-def low_stock_products(request):
+def low_stock(request):
     # Fetch low stock notifications for the logged-in user
     notifications = Notification.objects.filter(resolved=False)
 
@@ -209,7 +209,7 @@ def send_restock_request(request):
     session_key = f'restock_requests_{request.user.id}'
     request.session[session_key] = [r.id for r in restock_requests] 
 
-    return redirect('low_stock_products')
+    return redirect('low_stock')
 
 @login_required
 def supplier_requests(request):
@@ -335,23 +335,40 @@ def delete_product(request, product_id):
 
 def ajax_search(request):
     query = request.GET.get('query', '')
-    
+
     if query:
-        # Example: Search products by name and filter restock requests
         products = Product.objects.filter(product_name__icontains=query)
         restock_requests = RestockRequest.objects.filter(product__product_name__icontains=query)
 
-        product_data = [{"id": product.id, "product_name": product.product_name, "stock_quantity": product.stock_quantity, "price":product.price, "image_url":product.image_url} for product in products]
-        restock_data = [{"id": request.id, "product_name": request.product.product_name, "quantity": request.quantity} for request in restock_requests]
+        product_data = [
+            {
+                "id": product.id,
+                "product_name": product.product_name,
+                "stock_quantity": product.stock_quantity,
+                "price": product.price,
+                "description": product.description,
+                "image": product.image.url if product.image else ""  # <- key line
+            }
+            for product in products
+        ]
+
+        restock_data = [
+            {
+                "id": r.id,
+                "product_name": r.product.product_name,
+                "quantity": r.quantity
+            }
+            for r in restock_requests
+        ]
     else:
         product_data = []
         restock_data = []
 
-    # Return JSON response
     return JsonResponse({
         'products': product_data,
         'restock_requests': restock_data
     })
+
 
 
 def restock_management(request):
@@ -401,4 +418,201 @@ def generate_bill(request):
         'bill_data': bill_data,
         'total_cost': total_cost,
     })
+from django.http import JsonResponse
+from django.db.models import Sum, F
+from django.utils.timezone import now
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
+import calendar
+from collections import defaultdict
 
+def sales_graph_data(request):
+    """Get monthly sales data for the last 12 months"""
+    try:
+        from store.models import Purchased_item
+        
+        today = now().date()
+        data = {}
+        
+        # Start from 12 months ago
+        start_date = today.replace(day=1) - relativedelta(months=11)
+        
+        for i in range(12):
+            # Calculate month start and end
+            month_date = start_date + relativedelta(months=i)
+            month_start = month_date.replace(day=1)
+            month_end = (month_start + relativedelta(months=1)) - timedelta(days=1)
+            
+            # Create label
+            label = month_date.strftime("%b %Y")
+            
+            # Calculate total sales for this month
+            total_sales = Purchased_item.objects.filter(
+                order__date_ordered__range=[month_start, month_end]
+            ).aggregate(total=Sum('price'))['total'] or 0
+            
+            data[label] = float(total_sales)
+        
+        return JsonResponse({
+            "labels": list(data.keys()),
+            "sales": list(data.values())
+        })
+        
+    except ImportError:
+        return JsonResponse({
+            "labels": [],
+            "sales": []
+        })
+
+def abc_classification_data(request):
+    """ABC classification based on sales volume"""
+    try:
+        from store.models import Purchased_item
+        
+        # Aggregate sales by product
+        sales_data = defaultdict(float)
+        
+        # Remove the problematic select_related and use the correct fields
+        for item in Purchased_item.objects.select_related('user', 'order'):
+            # Use item name directly since 'product' field doesn't exist
+            product_name = getattr(item, 'name', f'Item {item.id}')
+            item_total = float(item.price * item.quantity) if hasattr(item, 'quantity') else float(item.price)
+            sales_data[product_name] += item_total
+        
+        if not sales_data:
+            return JsonResponse({
+                "percentages": [0, 0, 0],
+                "labels": ["A Items", "B Items", "C Items"]
+            })
+        
+        # Sort by total sales (descending)
+        sorted_data = sorted(sales_data.items(), key=lambda x: x[1], reverse=True)
+        total_sales = sum(val for _, val in sorted_data)
+        
+        a_count, b_count, c_count = 0, 0, 0
+        cumulative_sales = 0
+        
+        for product, value in sorted_data:
+            cumulative_sales += value
+            cumulative_percent = (cumulative_sales / total_sales) * 100
+            
+            if cumulative_percent <= 70:
+                a_count += 1
+            elif cumulative_percent <= 90:
+                b_count += 1
+            else:
+                c_count += 1
+        
+        return JsonResponse({
+            "percentages": [a_count, b_count, c_count],
+            "labels": ["A Items (70%)", "B Items (20%)", "C Items (10%)"]
+        })
+        
+    except ImportError:
+        return JsonResponse({
+            "percentages": [0, 0, 0],
+            "labels": ["A Items", "B Items", "C Items"]
+        })
+
+def top_products_data(request):
+    """Get top 5 products by sales"""
+    try:
+        from store.models import Purchased_item
+        
+        sales_data = defaultdict(float)
+        
+        # Remove the problematic select_related and use correct fields
+        for item in Purchased_item.objects.select_related('user', 'order'):
+            product_name = getattr(item, 'name', f'Item {item.id}')
+            item_total = float(item.price * item.quantity) if hasattr(item, 'quantity') else float(item.price)
+            sales_data[product_name] += item_total
+        
+        # Get top 5 products
+        top_items = sorted(sales_data.items(), key=lambda x: x[1], reverse=True)[:5]
+        
+        if not top_items:
+            return JsonResponse({
+                "labels": ["No Data"],
+                "sales": [0]
+            })
+        
+        labels = [name for name, _ in top_items]
+        values = [round(sales, 2) for _, sales in top_items]
+        
+        return JsonResponse({
+            "labels": labels,
+            "sales": values
+        })
+        
+    except ImportError:
+        return JsonResponse({
+            "labels": ["No Data"],
+            "sales": [0]
+        })
+
+def low_stock_products(request):
+    """Get products with stock below minimum threshold"""
+    try:
+        from inventory.models import Product
+        
+        products = Product.objects.filter(
+            stock_quantity__lte=F('minimum_stock_threshold')
+        ).order_by('stock_quantity')[:10]  # Limit to 10 for better visualization
+        
+        data = []
+        for product in products:
+            data.append({
+                "name": product.product_name,
+                "quantity": product.stock_quantity,
+                "threshold": product.minimum_stock_threshold,
+                "percentage": round((product.stock_quantity / product.minimum_stock_threshold * 100), 2) if product.minimum_stock_threshold > 0 else 0
+            })
+        
+        return JsonResponse({"low_stock": data})
+        
+    except ImportError:
+        return JsonResponse({"low_stock": []})
+
+def dashboard_counts(request):
+    """Get dashboard summary counts"""
+    data = {}
+    
+    # Get product count
+    try:
+        from inventory.models import Product
+        data["total_products"] = Product.objects.count()
+    except ImportError:
+        data["total_products"] = 0
+    
+    # Get order counts and total sales amount
+    try:
+        from store.models import FullOrder, Purchased_item
+        
+        data["total_orders"] = FullOrder.objects.count()
+        # Remove status filter since FullOrder doesn't have a status field
+        data["pending_orders"] = 0  # Set to 0 or implement different logic
+        
+        # Calculate total sales amount from FullOrder
+        total_amount = FullOrder.objects.aggregate(Sum('amount'))['amount__sum']
+        data["total_sales"] = float(total_amount) if total_amount is not None else 0
+        
+    except ImportError:
+        data["total_orders"] = 0
+        data["pending_orders"] = 0
+        data["total_sales"] = 0
+    
+    # Add supplier count if model exists
+    try:
+        from inventory.models import Supplier
+        data["total_suppliers"] = Supplier.objects.count()
+    except ImportError:
+        data["total_suppliers"] = 0
+    
+    # Add restock count if model exists
+    try:
+        from inventory.models import RestockRequest
+        data["total_restocks"] = RestockRequest.objects.filter(status='Pending').count()
+    except ImportError:
+        data["total_restocks"] = 0
+    
+    return JsonResponse(data)
